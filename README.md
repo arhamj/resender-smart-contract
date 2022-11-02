@@ -1,6 +1,6 @@
 # Resender
 
-Solidity smart contract to send back eth send to the contract by the caller (gas adjusted)
+Solidity smart contract to send back eth, sent to the contract by the caller (gas adjusted)
 
 ```
 npm i
