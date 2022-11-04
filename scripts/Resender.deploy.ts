@@ -6,7 +6,7 @@ async function main() {
   console.log('Account balance:', (await deployer.getBalance()).toString())
   const Resender = await ethers.getContractFactory('Resender')
   const resenderContract = await Resender.deploy(3)
-  console.log('Token address:', resenderContract.address)
+  console.log('Contract address:', resenderContract.address)
 }
 
 main()
