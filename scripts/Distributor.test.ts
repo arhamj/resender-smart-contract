@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { ethers as hardHatEthers } from 'hardhat'
 
-const DistributorContractAddress = '0x819d1B540E8001b4a32e72B0125F16cba12369BA'
+const DistributorContractAddress = '0xb0936B9940Ac013FfAC2CE4400465A92679e714d'
 // const DistributorContractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 const NumberOfShards = 100
 
