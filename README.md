@@ -14,3 +14,8 @@ npx hardhat compile
 npx hardhat test
 npx hardhat run scripts/<deploy script name>.ts
 ```
+
+```
+npx hardhat run scripts/SimpleToken.deploy.ts --network remote
+npx hardhat run scripts/SimpleToken.test.ts --network remote
+```

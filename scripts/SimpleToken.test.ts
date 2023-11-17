@@ -46,7 +46,7 @@ async function checkTokenBalance(address: string) {
 }
 
 async function main() {
-  // await tokenTransfer()
+  await tokenTransfer()
   await checkTokenBalance('0x32b6f2c027d4c9d99ca07d047d17987390a5eb39')
   await checkTokenBalance('0x0a0844da5e01e391d12999ca859da8a897d5979a')
 }
