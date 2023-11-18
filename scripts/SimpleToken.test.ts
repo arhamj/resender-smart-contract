@@ -1,6 +1,6 @@
 import { ethers as hardHatEthers } from 'hardhat'
 
-const SimpleTokenContractAddress = '0x4a5637Bf53992275B93Ff5e160669Ec5Ee9aB372'
+const SimpleTokenContractAddress = '0xEadcbd9115Eb06698ba6e1Cd7BB4C6381f9E6729'
 
 const recipientAddress = '0x0a0844da5e01e391d12999ca859da8a897d5979a'
 
