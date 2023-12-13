@@ -7,14 +7,31 @@ import pairArtifact from '@uniswap/v2-periphery/build/IUniswapV2Pair.json'
 import routerArtifact from '@uniswap/v2-periphery/build/UniswapV2Router02.json'
 import WETH9 from '../contracts/amm/WETH9.json'
 
+// const FactoryContractAddress = '0xb0936B9940Ac013FfAC2CE4400465A92679e714d'
+// const RouterContractAddress = '0x66c3ca101d1D83bb39CBA20EbF5F4D344Aa7514C'
+
+// const UsdtContractAddress = '0x484F7aBca20b5b52ea8D068dda1E5BB5025f9957'
+// const UsdcContractAddress = '0x80e293fC7a3338dC18F06917dbab58Fc921B1bb3'
+// const WethContractAddress = '0x113D9a7e00f0EFCfFCB9a4e9f7FdE768977A0BAf'
+// const isUsdtMinted = true
+// const isUsdcMinted = true
+// const isPairCreated = true
+// const isTokenApproved = true
+
 const FactoryContractAddress = null
+const RouterContractAddress = null
+
 const UsdtContractAddress = null
 const UsdcContractAddress = null
+const WethContractAddress = null
 const isUsdtMinted = false
 const isUsdcMinted = false
+const isPairCreated = false
+const isTokenApproved = false
 
 async function main() {
   const [owner] = await ethers.getSigners()
+  console.log('Owner address:', owner.address)
 
   const Factory = new ContractFactory(factoryArtifact.abi, factoryArtifact.bytecode, owner)
   let factory
@@ -53,11 +70,13 @@ async function main() {
   }
   console.log('USDC minted to:', owner.address)
 
-  const tx1 = await factory.createPair(usdt.address, usdc.address, {
-    gasPrice: ethers.utils.hexlify(1000000000000),
-    gasLimit: ethers.utils.hexlify(10000000),
-  })
-  await tx1.wait()
+  if (!isPairCreated) {
+    const tx1 = await factory.createPair(usdt.address, usdc.address, {
+      gasPrice: ethers.utils.hexlify(1000000000000),
+      gasLimit: ethers.utils.hexlify(10000000),
+    })
+    await tx1.wait()
+  }
 
   const pairAddress = await factory.getPair(usdt.address, usdc.address)
   console.log('Pair created:', pairAddress)
@@ -67,20 +86,32 @@ async function main() {
   console.log('Reserves:', reserves)
 
   const Weth = new ContractFactory(WETH9.abi, WETH9.bytecode, owner)
-  const weth = await Weth.deploy()
+  let weth
+  if (WethContractAddress) {
+    weth = await Weth.attach(WethContractAddress)
+  } else {
+    weth = await Weth.deploy()
+  }
   console.log('WETH deployed to:', weth.address)
 
   const Router = new ContractFactory(routerArtifact.abi, routerArtifact.bytecode, owner)
-  const router = await Router.deploy(factory.address, weth.address)
+  let router
+  if (RouterContractAddress) {
+    router = await Router.attach(RouterContractAddress)
+  } else {
+    router = await Router.deploy(factory.address, weth.address)
+  }
   console.log('Router deployed to:', router.address)
 
-  const approveTx1 = await usdt.approve(router.address, constants.MaxUint256)
-  await approveTx1.wait()
-  console.log('USDT approved to:', router.address)
+  if (!isTokenApproved) {
+    const approveTx1 = await usdt.approve(router.address, constants.MaxUint256)
+    await approveTx1.wait()
+    console.log('USDT approved to:', router.address)
 
-  const approveTx2 = await usdc.approve(router.address, constants.MaxUint256)
-  await approveTx2.wait()
-  console.log('USDC approved to:', router.address)
+    const approveTx2 = await usdc.approve(router.address, constants.MaxUint256)
+    await approveTx2.wait()
+    console.log('USDC approved to:', router.address)
+  }
 
   console.log('Adding liquidity...')
   console.log('Owner balance(USDT):', (await usdt.balanceOf(owner.address)).toString())
@@ -100,6 +131,21 @@ async function main() {
 
   reserves = await pair.getReserves()
   console.log('Reserves:', reserves)
+
+  const swapTx = await router.connect(owner).swapExactTokensForTokens(
+    token0Amount,
+    0,
+    [usdt.address, usdc.address],
+    owner.address,
+    deadline,
+    {
+      gasLimit: ethers.utils.hexlify(10000000),
+    },
+  )
+  await swapTx.wait()
+
+  reserves = await pair.getReserves()
+  console.log('Reserves after swap:', reserves)
 }
 
 main()
