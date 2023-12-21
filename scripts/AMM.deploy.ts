@@ -78,6 +78,7 @@ async function main() {
     await tx1.wait()
   }
 
+  // await sleep(5000)
   const pairAddress = await factory.getPair(usdt.address, usdc.address)
   console.log('Pair created:', pairAddress)
 
@@ -132,20 +133,19 @@ async function main() {
   reserves = await pair.getReserves()
   console.log('Reserves:', reserves)
 
-  const swapTx = await router.connect(owner).swapExactTokensForTokens(
-    token0Amount,
-    0,
-    [usdt.address, usdc.address],
-    owner.address,
-    deadline,
-    {
+  const swapTx = await router
+    .connect(owner)
+    .swapExactTokensForTokens(token0Amount, 0, [usdt.address, usdc.address], owner.address, deadline, {
       gasLimit: ethers.utils.hexlify(10000000),
-    },
-  )
+    })
   await swapTx.wait()
 
   reserves = await pair.getReserves()
   console.log('Reserves after swap:', reserves)
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 main()
