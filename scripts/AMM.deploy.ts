@@ -78,7 +78,7 @@ async function main() {
     await tx1.wait()
   }
 
-  // await sleep(5000)
+  await sleep(5000)
   const pairAddress = await factory.getPair(usdt.address, usdc.address)
   console.log('Pair created:', pairAddress)
 
