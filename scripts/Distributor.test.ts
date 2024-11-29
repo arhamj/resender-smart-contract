@@ -1,9 +1,9 @@
 import { ethers } from 'ethers'
 import { ethers as hardHatEthers } from 'hardhat'
 
-const DistributorContractAddress = '0xb0936B9940Ac013FfAC2CE4400465A92679e714d'
+const DistributorContractAddress = '0xaf17127F429CAF0693d8A2644549690ac7de011d'
 // const DistributorContractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
-const NumberOfShards = 100
+const NumberOfShards = 10
 
 function divideAndPickRandomAddresses(n: number): string[] {
   const segmentSize = ethers.constants.MaxUint256.div(n)

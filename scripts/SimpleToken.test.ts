@@ -1,6 +1,6 @@
 import { ethers as hardHatEthers } from 'hardhat'
 
-const SimpleTokenContractAddress = '0xEadcbd9115Eb06698ba6e1Cd7BB4C6381f9E6729'
+const SimpleTokenContractAddress = '0x82378e6Fe1b1803f0B2448E7089249f5F7704a33'
 
 const recipientAddress = '0x0a0844da5e01e391d12999ca859da8a897d5979a'
 
@@ -47,8 +47,6 @@ async function checkTokenBalance(address: string) {
 
 async function main() {
   await tokenTransfer()
-  await checkTokenBalance('0x32b6f2c027d4c9d99ca07d047d17987390a5eb39')
-  await checkTokenBalance('0x0a0844da5e01e391d12999ca859da8a897d5979a')
 }
 
 function sleep(ms: number) {

@@ -33,6 +33,7 @@ async function main() {
   const [owner] = await ethers.getSigners()
   console.log('Owner address:', owner.address)
 
+  const t1 = performance.now()
   const Factory = new ContractFactory(factoryArtifact.abi, factoryArtifact.bytecode, owner)
   let factory
   if (FactoryContractAddress) {
@@ -41,18 +42,23 @@ async function main() {
     factory = await Factory.deploy(owner.address)
   }
   console.log('Factory deployed to:', factory.address)
+  console.log('Time taken to deploy factory:', performance.now() - t1)
 
   const Usdt = await ethers.getContractFactory('Tether', owner)
   let usdt
   if (UsdtContractAddress) {
     usdt = await Usdt.attach(UsdtContractAddress)
   } else {
+    const t2 = performance.now()
     usdt = await Usdt.deploy()
+    console.log('Time taken to deploy USDT:', performance.now() - t2)
   }
   console.log('USDT deployed to:', usdt.address)
 
   if (!isUsdtMinted) {
+    const t3 = performance.now()
     await usdt.connect(owner).mint(owner.address, ethers.utils.parseEther('1000000000'))
+    console.log('Time taken to mint USDT:', performance.now() - t3)
   }
   console.log('USDT minted to:', owner.address)
 
@@ -61,21 +67,27 @@ async function main() {
   if (UsdcContractAddress) {
     usdc = await Usdc.attach(UsdcContractAddress)
   } else {
+    const t4 = performance.now()
     usdc = await Usdc.deploy()
+    console.log('Time taken to deploy USDC:', performance.now() - t4)
   }
   console.log('USDC deployed to:', usdc.address)
 
   if (!isUsdcMinted) {
+    const t5 = performance.now()
     await usdc.connect(owner).mint(owner.address, ethers.utils.parseEther('1000000000'))
+    console.log('Time taken to mint USDC:', performance.now() - t5)
   }
   console.log('USDC minted to:', owner.address)
 
   if (!isPairCreated) {
+    const t6 = performance.now()
     const tx1 = await factory.createPair(usdt.address, usdc.address, {
       gasPrice: ethers.utils.hexlify(1000000000000),
       gasLimit: ethers.utils.hexlify(10000000),
     })
     await tx1.wait()
+    console.log('Time taken to create pair:', performance.now() - t6)
   }
 
   await sleep(5000)
@@ -91,7 +103,9 @@ async function main() {
   if (WethContractAddress) {
     weth = await Weth.attach(WethContractAddress)
   } else {
+    const t7 = performance.now()
     weth = await Weth.deploy()
+    console.log('Time taken to attach WETH:', performance.now() - t7)
   }
   console.log('WETH deployed to:', weth.address)
 
@@ -100,18 +114,24 @@ async function main() {
   if (RouterContractAddress) {
     router = await Router.attach(RouterContractAddress)
   } else {
+    const t8 = performance.now()
     router = await Router.deploy(factory.address, weth.address)
+    console.log('Time taken to deploy router:', performance.now() - t8)
   }
   console.log('Router deployed to:', router.address)
 
   if (!isTokenApproved) {
+    const t9 = performance.now()
     const approveTx1 = await usdt.approve(router.address, constants.MaxUint256)
     await approveTx1.wait()
     console.log('USDT approved to:', router.address)
+    console.log('Time taken to approve USDT:', performance.now() - t9)
 
+    const t10 = performance.now()
     const approveTx2 = await usdc.approve(router.address, constants.MaxUint256)
     await approveTx2.wait()
     console.log('USDC approved to:', router.address)
+    console.log('Time taken to approve USDC:', performance.now() - t10)
   }
 
   console.log('Adding liquidity...')
@@ -123,22 +143,26 @@ async function main() {
 
   const deadline = Math.floor(Date.now() / 1000 + 10 * 60)
 
+  const t11 = performance.now()
   const addLiquidityTx = await router
     .connect(owner)
     .addLiquidity(usdt.address, usdc.address, token0Amount, token1Amount, 0, 0, owner.address, deadline, {
       gasLimit: ethers.utils.hexlify(10000000),
     })
   await addLiquidityTx.wait()
+  console.log('Time taken to add liquidity:', performance.now() - t11)
 
   reserves = await pair.getReserves()
   console.log('Reserves:', reserves)
 
+  const t12 = performance.now()
   const swapTx = await router
     .connect(owner)
     .swapExactTokensForTokens(token0Amount, 0, [usdt.address, usdc.address], owner.address, deadline, {
       gasLimit: ethers.utils.hexlify(10000000),
     })
   await swapTx.wait()
+  console.log('Time taken to swap:', performance.now() - t12)
 
   reserves = await pair.getReserves()
   console.log('Reserves after swap:', reserves)
